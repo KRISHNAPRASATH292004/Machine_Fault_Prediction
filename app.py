@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify
 import pandas as pd
 import numpy as np
 import joblib
@@ -10,18 +10,19 @@ app = Flask(__name__)
 model = joblib.load("hybrid_model.pkl")
 features = joblib.load("model_features.pkl")
 
-# Load RF and GB for feature importance
+# Extract feature importances
 rf = model.named_estimators_['rf']
 gb = model.named_estimators_['gb']
 rf_importance = rf.feature_importances_
 gb_importance = gb.feature_importances_
 avg_importance = (rf_importance + gb_importance) / 2
+
 feature_importance_df = pd.DataFrame({
     "Feature": features,
     "Importance": avg_importance
 }).sort_values(by="Importance", ascending=False)
 
-# Simulate one row of data
+# Simulate one row of input data
 def simulate_data():
     return {
         "Footfall": random.randint(20, 100),
@@ -34,10 +35,6 @@ def simulate_data():
         "IP": random.uniform(2, 20),
         "Temperature": random.uniform(20, 90)
     }
-
-@app.route("/")
-def home():
-    return render_template("index.html")
 
 @app.route("/api/predict", methods=["GET"])
 def predict():
