@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: machine-fault-backend
+    env: python
+    buildCommand: ""
+    startCommand: gunicorn app:app
+    region: oregon
+    plan: free
+    branch: main
+    rootDir: backend
+    autoDeploy: true
